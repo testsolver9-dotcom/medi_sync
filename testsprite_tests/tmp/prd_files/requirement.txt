@@ -1,0 +1,120 @@
+{
+  "tech_stack": [
+    "JavaScript",
+    "React",
+    "React Router",
+    "Tailwind CSS",
+    "Zustand",
+    "Framer Motion",
+    "@headlessui/react",
+    "@heroicons/react",
+    "Axios"
+  ],
+  "features": [
+    {
+      "name": "Patient Authentication Modal",
+      "description": "Handles patient login and registration with OTP verification.",
+      "files": ["src/pages/patient/PatientAuthModal.js"]
+    },
+    {
+      "name": "Patient Dashboard",
+      "description": "Displays patient info, medical records, pathology reports, and access logs.",
+      "files": ["src/pages/patient/PatientDashboard.js"]
+    },
+    {
+      "name": "Patient Medical Records",
+      "description": "Shows a table of patient medical records fetched from mock API.",
+      "files": ["src/pages/patient/Records.js"]
+    },
+    {
+      "name": "Patient Pathology Reports",
+      "description": "Displays pathology/lab reports for the patient.",
+      "files": ["src/pages/patient/Reports.js"]
+    },
+    {
+      "name": "Patient Access Logs",
+      "description": "Shows a log of who accessed the patient's records.",
+      "files": ["src/pages/patient/AccessLogs.js"]
+    },
+    {
+      "name": "AI Symptom Checker",
+      "description": "Chat interface for patients to interact with an AI bot.",
+      "files": ["src/pages/patient/AIChat.js", "src/components/ChatWidget.js"]
+    },
+    {
+      "name": "Emergency Support",
+      "description": "Locates and lists nearby hospitals for patients in emergencies.",
+      "files": ["src/pages/patient/Emergency.js"]
+    },
+    {
+      "name": "Doctor Registration",
+      "description": "Handles doctor registration and OTP verification.",
+      "files": ["src/pages/doctor/Register.js"]
+    },
+    {
+      "name": "Doctor Login",
+      "description": "Handles doctor login with OTP verification.",
+      "files": ["src/pages/doctor/Login.js"]
+    },
+    {
+      "name": "Doctor Dashboard",
+      "description": "Displays patient records for the doctor and allows navigation to record details.",
+      "files": ["src/pages/doctor/Dashboard.js"]
+    },
+    {
+      "name": "New Consultation Record",
+      "description": "Allows doctors to create and save new consultation records for patients.",
+      "files": ["src/pages/doctor/NewRecord.js"]
+    },
+    {
+      "name": "Doctor Access History",
+      "description": "Shows a history of patient record accesses by the doctor.",
+      "files": ["src/pages/doctor/AccessHistory.js"]
+    },
+    {
+      "name": "Patient Access Consent",
+      "description": "Allows doctors to request patient consent for accessing records.",
+      "files": ["src/pages/doctor/PatientAccess.js"]
+    },
+    {
+      "name": "Location Selection",
+      "description": "Lets doctors select their practice location before accessing patient records.",
+      "files": ["src/pages/doctor/LocationSelection.js"]
+    },
+    {
+      "name": "Home Page",
+      "description": "Landing page with navigation for patient and doctor login.",
+      "files": ["src/pages/home_page_ui.js"]
+    },
+    {
+      "name": "Protected Route",
+      "description": "Route guard for patient and doctor protected routes.",
+      "files": ["src/components/ProtectedRoute.js"]
+    },
+    {
+      "name": "Sidebar Navigation (Shared)",
+      "description": "Sidebar navigation for patient and doctor dashboards.",
+      "files": ["src/components/SidebarNav.js", "src/components/doctor/SidebarNav.js"]
+    },
+    {
+      "name": "Step Indicator",
+      "description": "Step progress indicator for multi-step doctor flows.",
+      "files": ["src/components/doctor/StepIndicator.js"]
+    },
+    {
+      "name": "Fancy Button",
+      "description": "Reusable animated button with loading spinner.",
+      "files": ["src/components/FancyButton.js"]
+    },
+    {
+      "name": "State Management (Zustand)",
+      "description": "Global state for user and doctor using Zustand stores.",
+      "files": ["src/store/user_store.js", "src/store/useDoctorStore.js"]
+    },
+    {
+      "name": "Mock API Services",
+      "description": "Mocked API endpoints for patient and doctor workflows.",
+      "files": ["src/services/mockApi.js", "src/services/doctorApi.js"]
+    }
+  ]
+} 

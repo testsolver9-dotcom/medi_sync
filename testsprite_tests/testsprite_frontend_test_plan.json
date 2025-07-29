@@ -1,0 +1,496 @@
+[
+  {
+    "id": "TC001",
+    "title": "Patient OTP Authentication Success",
+    "description": "Verify that a patient can successfully log in or register using the OTP authentication modal with a valid phone number and OTP.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the patient authentication modal."
+      },
+      {
+        "type": "action",
+        "description": "Input a valid phone number."
+      },
+      {
+        "type": "action",
+        "description": "Request OTP and input the received OTP."
+      },
+      {
+        "type": "action",
+        "description": "Submit the authentication form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the patient is successfully logged in and redirected to the patient dashboard."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Patient OTP Authentication Failure",
+    "description": "Verify that patient login/registration fails with invalid OTP or invalid phone number input.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the patient authentication modal."
+      },
+      {
+        "type": "action",
+        "description": "Input an invalid phone number or incorrect OTP."
+      },
+      {
+        "type": "action",
+        "description": "Submit the authentication form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that an error message is displayed and access is denied."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Doctor OTP Registration Success",
+    "description": "Verify that a doctor can successfully register using OTP verification with valid credentials.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the doctor registration page."
+      },
+      {
+        "type": "action",
+        "description": "Input valid registration details including phone number."
+      },
+      {
+        "type": "action",
+        "description": "Request OTP and input the received OTP."
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the doctor is registered successfully and redirected to the location selection page."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Doctor OTP Login Success",
+    "description": "Verify that a registered doctor can successfully log in using OTP verification.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the doctor login page."
+      },
+      {
+        "type": "action",
+        "description": "Input valid registered phone number."
+      },
+      {
+        "type": "action",
+        "description": "Request OTP and input the received OTP."
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify successful login and redirection to the location selection page."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Doctor Location Selection Functionality",
+    "description": "Verify that a doctor can select their practice location before accessing patient records and the selection affects their contextual data correctly.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a doctor."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to location selection page."
+      },
+      {
+        "type": "action",
+        "description": "Select a valid practice location from available options."
+      },
+      {
+        "type": "action",
+        "description": "Confirm selection."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the location selection is saved and next pages are contextualized accordingly."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Patient Dashboard Displays Accurate Medical Data",
+    "description": "Verify the patient dashboard shows up-to-date personal information, medical records, pathology reports, and access logs correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a patient."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the patient dashboard."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify personal information is displayed correctly."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify medical records and pathology reports are accurately fetched and shown."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access logs show recent and historical access details."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Doctor Dashboard Patient Records Navigation",
+    "description": "Verify the doctor dashboard allows proper navigation through patient records, consultations, and supports record detail views.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a doctor and complete location selection."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the doctor dashboard."
+      },
+      {
+        "type": "action",
+        "description": "Select a patient record from the list."
+      },
+      {
+        "type": "action",
+        "description": "View detailed medical records and consultation history."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that the patient records and consultation details are displayed accurately."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Doctor Creates and Saves New Consultation Record",
+    "description": "Verify that doctors can create new consultation records and that these records are saved and reflected in the patient data correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a doctor and select a practice location."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to a patient's consultation record page."
+      },
+      {
+        "type": "action",
+        "description": "Create a new consultation record with valid inputs."
+      },
+      {
+        "type": "action",
+        "description": "Save the new consultation record."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new consultation record is saved and visible in the patient's medical records."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "AI Symptom Checker Conversational Response",
+    "description": "Verify that the AI symptom checker properly responds contextually to patient input maintaining conversational flow.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a patient."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the AI symptom checker chat interface."
+      },
+      {
+        "type": "action",
+        "description": "Input a typical symptom description."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the AI provides relevant symptom analysis and follow-up questions."
+      },
+      {
+        "type": "action",
+        "description": "Input a follow-up symptom description or answer."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify conversational context is maintained with appropriate responses."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Emergency Support Locates Nearby Hospitals",
+    "description": "Verify that the Emergency Support feature accurately locates and lists nearby hospitals based on patient's current or specified location.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a patient."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the Emergency Support page."
+      },
+      {
+        "type": "action",
+        "description": "Allow or input location data."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the platform lists relevant nearby hospitals with contact details."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Doctor Requests Patient Consent for Record Access",
+    "description": "Verify that a doctor can successfully request patient consent before accessing sensitive patient records and that the request is recorded.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a doctor and select a practice location."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the patient access consent page."
+      },
+      {
+        "type": "action",
+        "description": "Request access consent from the patient."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the consent request is sent and recorded."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Access Blocked Without Patient Consent",
+    "description": "Verify that a doctor is denied access to patient records if patient consent has not been granted.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a doctor and select a practice location."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access patient records without prior consent."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that access is denied and an appropriate message is shown."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Patient Views Access Logs for Transparency",
+    "description": "Verify that patients can view a comprehensive log showing who accessed their records and when, ensuring transparency.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a patient."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the access logs page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify logs display detailed and comprehensive access history."
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Protected Routes Block Unauthorized Access",
+    "description": "Verify that protected routes prevent unauthorized users from accessing patient and doctor dashboards and sensitive pages.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access patient dashboard without authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied and redirected to login modal."
+      },
+      {
+        "type": "action",
+        "description": "Attempt to access doctor dashboard without authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify access is denied and redirected to login page."
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Reusable UI Components Functionality and Accessibility",
+    "description": "Verify that reusable UI components like Sidebar Navigation, Step Indicators, and Fancy Buttons operate smoothly, visually animated, and meet accessibility standards.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Inspect sidebar navigation for responsiveness and correct routing."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify sidebar navigation is intuitive and keyboard accessible."
+      },
+      {
+        "type": "action",
+        "description": "Use step indicator on multi-step doctor workflows."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify step indicator correctly highlights current step and is accessible."
+      },
+      {
+        "type": "action",
+        "description": "Interact with fancy buttons including loading states."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify buttons are visually animated, respond to user input, and keyboard accessible."
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Invalid Inputs Handled in Authentication Flows",
+    "description": "Verify that all forms in patient and doctor OTP authentication gracefully handle invalid inputs such as empty fields, malformed phone numbers, and timeouts in OTP verification.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open patient or doctor authentication modal or page."
+      },
+      {
+        "type": "action",
+        "description": "Leave phone number field empty and attempt submission."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify error messages indicating required fields."
+      },
+      {
+        "type": "action",
+        "description": "Input improperly formatted phone number."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation error is presented."
+      },
+      {
+        "type": "action",
+        "description": "Input correct phone but invalid or expired OTP."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify OTP verification failure error is displayed."
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Doctor Access History Displays Correct Logs",
+    "description": "Verify that the doctor access history page correctly lists all patient record accesses with accurate timestamps and access details.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a doctor and complete location selection."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the doctor access history page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all patient record access events are shown with precise and complete information."
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Patient Access Consent Denial Flow",
+    "description": "Verify that when a patient denies a doctor's access consent request, the doctor is notified and access remains blocked.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in as a patient."
+      },
+      {
+        "type": "action",
+        "description": "Receive a doctor's consent request notification."
+      },
+      {
+        "type": "action",
+        "description": "Deny the consent request."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the doctor receives denial notification and cannot access patient records."
+      }
+    ]
+  }
+]

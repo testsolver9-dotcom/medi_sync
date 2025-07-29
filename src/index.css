@@ -1,0 +1,16 @@
+/* File: src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+  color: #1f2937;
+  min-height: 100vh;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

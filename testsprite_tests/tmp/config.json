@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "loginUser": "Abhinav",
+  "loginPassword": "asdfghjkl",
+  "executionArgs": {
+    "projectName": "medisync-frontend",
+    "projectPath": "d:/medsync/medisync-frontend",
+    "testIds": [],
+    "additionalInstruction": "",
+    "envs": {
+      "API_KEY": "sk-user-BrSLpaDYyScSwrA51UURWt23uFQG20hXYuGRAIPCRDYJ0mhZcKvqF5lL_3sNur6zYMj0CTHJ6pem5-SDvo_2k3pOCs_fgzIeXtUoq5dxRRQl8SuWdJx543LCkUldQU7u8W4"
+    }
+  },
+  "proxy": "http://55a3b26b-4f0d-47e3-b1c0-b1a949f32969:FqmD6KAay0No6xC3w0I8tq5Ve6ZBwQS7@tun.testsprite.com:8080"
+}
