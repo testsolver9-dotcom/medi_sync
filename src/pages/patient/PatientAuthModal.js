@@ -26,23 +26,102 @@ export default function PatientAuthModal() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
 
-  // Signup fields
+  // NEW Registration fields - completely replacing old ones
   const [signupData, setSignupData] = useState({
-    name: '', age: '', sex: '', weight: '', height: '', allergies: '', chronic: ''
+    fullName: '', 
+    email: '', 
+    phone: '', 
+    dateOfBirth: '', 
+    gender: '', 
+    address: '', 
+    password: '', 
+    confirmPassword: ''
   });
 
   const [formErrors, setFormErrors] = useState({});
 
+  // Email validation helper
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Password validation helper
+  const isValidPassword = (password) => {
+    return password.length >= 8 && 
+           /[A-Z]/.test(password) && 
+           /[a-z]/.test(password) && 
+           /\d/.test(password);
+  };
+
+  // Phone validation helper
+  const isValidPhone = (phone) => {
+    const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
+    return phoneRegex.test(phone);
+  };
+
   const validateSignupForm = () => {
     const errors = {};
-    const { name, age, sex, weight, height } = signupData;
+    const { fullName, email, phone, dateOfBirth, gender, address, password, confirmPassword } = signupData;
     
-    if (!name.trim()) errors.name = "Name is required";
-    if (!age || age < 1 || age > 120) errors.age = "Valid age is required";
-    if (!sex.trim()) errors.sex = "Gender is required";
-    if (!weight || weight < 1) errors.weight = "Valid weight is required";
-    if (!height || height < 1) errors.height = "Valid height is required";
-    if (!phone.trim()) errors.phone = "Phone number is required";
+    // Full Name validation
+    if (!fullName.trim()) {
+      errors.fullName = "Full name is required";
+    } else if (fullName.trim().length < 2) {
+      errors.fullName = "Full name must be at least 2 characters";
+    }
+
+    // Email validation
+    if (!email.trim()) {
+      errors.email = "Email address is required";
+    } else if (!isValidEmail(email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    // Phone validation  
+    if (!phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (!isValidPhone(phone)) {
+      errors.phone = "Please enter a valid phone number (min 10 digits)";
+    }
+
+    // Date of Birth validation
+    if (!dateOfBirth) {
+      errors.dateOfBirth = "Date of birth is required";
+    } else {
+      const dob = new Date(dateOfBirth);
+      const today = new Date();
+      const age = today.getFullYear() - dob.getFullYear();
+      if (age < 1 || age > 120) {
+        errors.dateOfBirth = "Please enter a valid date of birth";
+      }
+    }
+
+    // Gender validation
+    if (!gender.trim()) {
+      errors.gender = "Gender is required";
+    }
+
+    // Address validation
+    if (!address.trim()) {
+      errors.address = "Address is required";
+    } else if (address.trim().length < 10) {
+      errors.address = "Please enter a complete address (minimum 10 characters)";
+    }
+
+    // Password validation
+    if (!password) {
+      errors.password = "Password is required";
+    } else if (!isValidPassword(password)) {
+      errors.password = "Password must be at least 8 characters with uppercase, lowercase, and number";
+    }
+
+    // Confirm Password validation
+    if (!confirmPassword) {
+      errors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -91,7 +170,7 @@ export default function PatientAuthModal() {
     setLoading(true);
     setOtpError('');
     try {
-      await registerPatient({ ...signupData, phone });
+      await registerPatient(signupData);
       setStep(2);
       setSuccessMessage('Registration initiated! OTP sent to your phone.');
     } catch (error) {
@@ -109,7 +188,7 @@ export default function PatientAuthModal() {
     setLoading(true);
     setOtpError("");
     try {
-      const user = await verifySignupOtp(phone, otp);
+      const user = await verifySignupOtp(signupData.phone, otp);
       setUser(user);
       setSuccessMessage('Registration successful! Welcome to MediSync!');
       setTimeout(() => navigate('/dashboard'), 1000);
@@ -131,13 +210,21 @@ export default function PatientAuthModal() {
     }
   };
 
+  const handleInputChange = (field, value) => {
+    setSignupData(prev => ({ ...prev, [field]: value }));
+    // Clear error for this field
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-6 text-white">
@@ -290,7 +377,7 @@ export default function PatientAuthModal() {
                 )}
               </motion.div>
             ) : (
-              // SIGNUP FLOW
+              // SIGNUP FLOW - COMPLETELY NEW FORM
               <motion.div
                 key="signup"
                 initial={{ opacity: 0, x: 20 }}
@@ -300,110 +387,131 @@ export default function PatientAuthModal() {
               >
                 {step === 1 ? (
                   <div className="space-y-4">
+                    {/* Full Name */}
                     <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                       <input
                         type="text"
-                        name="name"
-                        placeholder="Full Name *"
-                        value={signupData.name}
-                        onChange={e => setSignupData({ ...signupData, name: e.target.value })}
+                        placeholder="Enter your full name"
+                        value={signupData.fullName}
+                        onChange={e => handleInputChange('fullName', e.target.value)}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                          formErrors.name ? 'border-red-300' : 'border-gray-300'
+                          formErrors.fullName ? 'border-red-300' : 'border-gray-300'
                         }`}
                       />
-                      {formErrors.name && <p className="text-red-600 text-xs mt-1">{formErrors.name}</p>}
+                      {formErrors.fullName && <p className="text-red-600 text-xs mt-1">{formErrors.fullName}</p>}
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <input
-                          type="number"
-                          name="age"
-                          placeholder="Age *"
-                          value={signupData.age}
-                          onChange={e => setSignupData({ ...signupData, age: e.target.value })}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                            formErrors.age ? 'border-red-300' : 'border-gray-300'
-                          }`}
-                        />
-                        {formErrors.age && <p className="text-red-600 text-xs mt-1">{formErrors.age}</p>}
-                      </div>
-                      <div>
-                        <select
-                          name="sex"
-                          value={signupData.sex}
-                          onChange={e => setSignupData({ ...signupData, sex: e.target.value })}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                            formErrors.sex ? 'border-red-300' : 'border-gray-300'
-                          }`}
-                        >
-                          <option value="">Gender *</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                        </select>
-                        {formErrors.sex && <p className="text-red-600 text-xs mt-1">{formErrors.sex}</p>}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <input
-                          type="number"
-                          name="weight"
-                          placeholder="Weight (kg) *"
-                          value={signupData.weight}
-                          onChange={e => setSignupData({ ...signupData, weight: e.target.value })}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                            formErrors.weight ? 'border-red-300' : 'border-gray-300'
-                          }`}
-                        />
-                        {formErrors.weight && <p className="text-red-600 text-xs mt-1">{formErrors.weight}</p>}
-                      </div>
-                      <div>
-                        <input
-                          type="number"
-                          name="height"
-                          placeholder="Height (cm) *"
-                          value={signupData.height}
-                          onChange={e => setSignupData({ ...signupData, height: e.target.value })}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                            formErrors.height ? 'border-red-300' : 'border-gray-300'
-                          }`}
-                        />
-                        {formErrors.height && <p className="text-red-600 text-xs mt-1">{formErrors.height}</p>}
-                      </div>
-                    </div>
-                    
-                    <input
-                      type="text"
-                      name="allergies"
-                      placeholder="Known Allergies (optional)"
-                      value={signupData.allergies}
-                      onChange={e => setSignupData({ ...signupData, allergies: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    />
-                    
-                    <input
-                      type="text"
-                      name="chronic"
-                      placeholder="Chronic Conditions (optional)"
-                      value={signupData.chronic}
-                      onChange={e => setSignupData({ ...signupData, chronic: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                    />
-                    
+                    {/* Email */}
                     <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                       <input
-                        type="text"
-                        placeholder="Phone Number *"
-                        value={phone}
-                        onChange={e => setPhone(e.target.value)}
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={signupData.email}
+                        onChange={e => handleInputChange('email', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.email ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.email && <p className="text-red-600 text-xs mt-1">{formErrors.email}</p>}
+                    </div>
+                    
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                      <input
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        value={signupData.phone}
+                        onChange={e => handleInputChange('phone', e.target.value)}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
                           formErrors.phone ? 'border-red-300' : 'border-gray-300'
                         }`}
                       />
                       {formErrors.phone && <p className="text-red-600 text-xs mt-1">{formErrors.phone}</p>}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Date of Birth */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth *</label>
+                        <input
+                          type="date"
+                          value={signupData.dateOfBirth}
+                          onChange={e => handleInputChange('dateOfBirth', e.target.value)}
+                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                            formErrors.dateOfBirth ? 'border-red-300' : 'border-gray-300'
+                          }`}
+                        />
+                        {formErrors.dateOfBirth && <p className="text-red-600 text-xs mt-1">{formErrors.dateOfBirth}</p>}
+                      </div>
+                      
+                      {/* Gender */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                        <select
+                          value={signupData.gender}
+                          onChange={e => handleInputChange('gender', e.target.value)}
+                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                            formErrors.gender ? 'border-red-300' : 'border-gray-300'
+                          }`}
+                        >
+                          <option value="">Select Gender</option>
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        {formErrors.gender && <p className="text-red-600 text-xs mt-1">{formErrors.gender}</p>}
+                      </div>
+                    </div>
+                    
+                    {/* Address */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Address *</label>
+                      <textarea
+                        placeholder="Enter your complete address (street, city, state, postal code)"
+                        value={signupData.address}
+                        onChange={e => handleInputChange('address', e.target.value)}
+                        rows={3}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
+                          formErrors.address ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.address && <p className="text-red-600 text-xs mt-1">{formErrors.address}</p>}
+                    </div>
+                    
+                    {/* Password */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                      <input
+                        type="password"
+                        placeholder="Enter a strong password"
+                        value={signupData.password}
+                        onChange={e => handleInputChange('password', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.password ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.password && <p className="text-red-600 text-xs mt-1">{formErrors.password}</p>}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Must be 8+ characters with uppercase, lowercase, and number
+                      </p>
+                    </div>
+                    
+                    {/* Confirm Password */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password *</label>
+                      <input
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={signupData.confirmPassword}
+                        onChange={e => handleInputChange('confirmPassword', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      />
+                      {formErrors.confirmPassword && <p className="text-red-600 text-xs mt-1">{formErrors.confirmPassword}</p>}
                     </div>
                     
                     <button

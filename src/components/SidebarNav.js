@@ -1,13 +1,25 @@
 // shared sidebar nav (used in patient dashboards)
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useUserStore } from "../store/user_store";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function SidebarNav() {
   const [open, setOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const user = useUserStore(s => s.user);
   const logout = useUserStore(s => s.logout);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const navItems = [
     { 
@@ -64,7 +76,7 @@ export default function SidebarNav() {
 
       {/* Overlay for mobile */}
       <AnimatePresence>
-        {open && (
+        {open && isMobile && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -78,8 +90,10 @@ export default function SidebarNav() {
       {/* Sidebar */}
       <motion.nav
         initial={false}
-        animate={{ x: open ? 0 : "-100%" }}
-        className={`fixed md:static top-0 left-0 h-full w-80 bg-white border-r shadow-xl z-50 transform transition-transform duration-300 md:translate-x-0 md:block flex flex-col`}
+        animate={{ 
+          x: isMobile ? (open ? 0 : "-100%") : 0 
+        }}
+        className={`fixed md:static top-0 left-0 h-full w-80 bg-white border-r shadow-xl z-50 flex flex-col`}
       >
         {/* Header */}
         <div className="p-6 border-b bg-gradient-to-r from-blue-600 to-teal-600 text-white">
