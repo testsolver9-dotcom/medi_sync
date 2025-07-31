@@ -73,10 +73,21 @@ const _logs = [
   { time: "2024-11-20 11:20", action: "Upload Lab Report", by: "MedLab Plus (LAB001)" }
 ];
 
-// 1) Patient registration & OTP
+// 1) Patient registration & OTP - UPDATED for new fields
 export async function registerPatient(data) {
-  console.log("registerPatient", data);
-  // simulate API delay
+  console.log("registerPatient with new fields:", data);
+  // Simulate API delay and validate new required fields
+  const { fullName, email, phone, dateOfBirth, gender, address, password } = data;
+  
+  if (!fullName || !email || !phone || !dateOfBirth || !gender || !address || !password) {
+    throw new Error('All required fields must be provided');
+  }
+  
+  // Simulate validation
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error('Invalid email format');
+  }
+  
   return new Promise((res) => setTimeout(res, 800));
 }
 
@@ -93,7 +104,10 @@ export async function verifySignupOtp(phone, otp) {
     weight: "65 kg", 
     height: "170 cm", 
     allergies: "Penicillin, Peanuts", 
-    chronic: "Mild Hypertension" 
+    chronic: "Mild Hypertension",
+    email: "jane.doe@email.com",
+    phone: phone,
+    address: "123 Main St, City, State 12345"
   };
 }
 
@@ -116,7 +130,10 @@ export async function verifyOtp(phoneOrId, otp) {
     weight: "65 kg", 
     height: "170 cm", 
     allergies: "Penicillin, Peanuts", 
-    chronic: "Mild Hypertension" 
+    chronic: "Mild Hypertension",
+    email: "jane.doe@email.com",
+    phone: phoneOrId,
+    address: "123 Main St, City, State 12345"
   };
 }
 
