@@ -1,4 +1,5 @@
 // Mock implementations for doctor workflows
+import { fetchPatientRecords } from "./mockApi";
 export const sendDoctorOtp = async (doctorId) => {
   console.debug("Mock: send OTP to doctor", doctorId);
   return Promise.resolve();
@@ -16,9 +17,24 @@ export const verifyDoctorOtp = async (doctorId, otp) => {
 // --- NEW: registration mocks ---
 
 // Step 1: register doctor (collect name, email, NMC, phone, etc.)
+// Step 1: register doctor (collect name, email, phone, specialization, location, password)
 export const registerDoctor = async (data) => {
   console.debug("Mock: register doctor", data);
-  // in real: validate NMC/API, send OTP via Twilio
+  const { name, email, phone, specialization, location, password } = data;
+  // basic validations similar to frontend; throw error if invalid
+  if (!name?.trim()) throw new Error("Name is required");
+  if (!email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("Invalid email");
+  }
+  if (!phone?.trim() || !/^\+?[\d\s\-()]{10,}$/.test(phone)) {
+    throw new Error("Invalid phone number");
+  }
+  if (!specialization?.trim()) throw new Error("Specialization is required");
+  if (!location?.trim()) throw new Error("Location is required");
+  if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+    throw new Error("Weak password");
+  }
+  // in real: save doctor and send OTP via SMS/email
   return Promise.resolve();
 };
 
@@ -43,12 +59,9 @@ export const requestPatientConsent = async (patientId) => {
 
 export const fetchRecords = async (doctorId, patientId) => {
   console.debug("Mock: fetchRecords for", doctorId, patientId);
-  return Promise.resolve({
-    records: [
-      { id: "r1", date: "2025-06-20", symptoms: "Fever, cough", diagnosis: "Flu", },
-      { id: "r2", date: "2025-05-11", symptoms: "Headache", diagnosis: "Migraine" },
-    ]
-  });
+  // delegate to patient record fetcher so both doctor and patient view same data
+  const patientRecords = await fetchPatientRecords(patientId);
+  return { records: patientRecords };
 };
 
 export const saveRecord = async (record) => {
