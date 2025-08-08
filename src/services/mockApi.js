@@ -2,35 +2,38 @@
 
 // Enhanced fake in‐memory "database" with more realistic medical data
 let _records = [
-  { 
-    id: 1, 
-    date: "2024-12-15", 
-    doctorName: "Dr. Sarah Johnson", 
-    symptoms: "Fever, headache, body aches",
-    diagnosis: "Viral Fever",
-    medicines: "Paracetamol 650mg, Rest, Plenty of fluids",
-    notes: "Patient advised to return if symptoms worsen. Follow-up in 3 days.",
-    fileUrl: "#" 
+  {
+    id: 1,
+    date: "2024-12-15",
+    doctorName: "Dr. Sarah Johnson",
+    title: "Fever Consultation",
+    description: "Patient reports fever, headache and body aches",
+    prescription: "Paracetamol 650mg, Rest, Plenty of fluids",
+    tests_recommended: "",
+    notes: "Patient advised to return if symptoms worsen. Follow‑up in 3 days.",
+    fileUrl: "#"
   },
-  { 
-    id: 2, 
-    date: "2024-11-28", 
-    doctorName: "Dr. Michael Chen", 
-    symptoms: "Chest pain, shortness of breath",
-    diagnosis: "Anxiety-related chest discomfort",
-    medicines: "Alprazolam 0.25mg (as needed), Relaxation exercises",
+  {
+    id: 2,
+    date: "2024-11-28",
+    doctorName: "Dr. Michael Chen",
+    title: "Chest Discomfort",
+    description: "Chest pain, shortness of breath",
+    prescription: "Alprazolam 0.25mg (as needed), Relaxation exercises",
+    tests_recommended: "ECG",
     notes: "ECG normal. Stress management techniques recommended.",
-    fileUrl: "#" 
+    fileUrl: "#"
   },
-  { 
-    id: 3, 
-    date: "2024-10-05", 
-    doctorName: "Dr. Emily Williams", 
-    symptoms: "Persistent cough, sore throat",
-    diagnosis: "Upper Respiratory Tract Infection",
-    medicines: "Azithromycin 500mg, Cough syrup, Throat lozenges",
+  {
+    id: 3,
+    date: "2024-10-05",
+    doctorName: "Dr. Emily Williams",
+    title: "Upper Respiratory Infection",
+    description: "Persistent cough and sore throat",
+    prescription: "Azithromycin 500mg, Cough syrup, Throat lozenges",
+    tests_recommended: "",
     notes: "Complete course of antibiotics. Voice rest recommended.",
-    fileUrl: "#" 
+    fileUrl: "#"
   }
 ];
 
@@ -76,18 +79,21 @@ const _logs = [
 // 1) Patient registration & OTP - UPDATED for new fields
 export async function registerPatient(data) {
   console.log("registerPatient with new fields:", data);
-  // Simulate API delay and validate new required fields
-  const { fullName, email, phone, dateOfBirth, gender, address, password } = data;
-  
-  if (!fullName || !email || !phone || !dateOfBirth || !gender || !address || !password) {
+  // Destructure expected fields from data based on DB schema
+  const { name, email, phone, gender, address, password } = data;
+  // Validate presence of required fields
+  if (!name || !email || !phone || !gender || !address || !password) {
     throw new Error('All required fields must be provided');
   }
-  
-  // Simulate validation
+  // Validate email format
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     throw new Error('Invalid email format');
   }
-  
+  // Validate phone number (basic)
+  if (!/^\+?[\d\s\-()]{10,}$/.test(phone)) {
+    throw new Error('Invalid phone number');
+  }
+  // Simulate server delay
   return new Promise((res) => setTimeout(res, 800));
 }
 
@@ -156,16 +162,17 @@ export async function fetchAccessLogs(patientId) {
 // 4) Upload record
 export async function uploadRecord(patientId, record) {
   console.log("uploadRecord for", patientId, record);
-  // Add new record to the top
+  // Add new record to the top with fields aligned to the medical_record table
   _records = [
     {
       id: Date.now(),
       date: new Date().toISOString().slice(0, 10),
       doctorName: record.doctorName || "Dr. Smith",
-      symptoms: record.symptoms || "General consultation",
-      diagnosis: record.diagnosis || "Under observation",
-      medicines: record.medicines || "As prescribed",
-      notes: record.notes || "Follow-up as needed",
+      title: record.title || "Untitled Record",
+      description: record.description || "",
+      prescription: record.prescription || "",
+      tests_recommended: record.tests_recommended || "",
+      notes: record.notes || "",
       fileUrl: "#"
     },
     ..._records
