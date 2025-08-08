@@ -15,41 +15,50 @@ export default function DoctorRegister() {
   const [success, setSuccess] = useState("");
   const [otp, setOtp] = useState("");
   
+  // registration form fields aligned with doctor table schema
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    nmcNumber: "",
-    specialty: "",
-    experience: "",
-    hospitalName: "",
-    city: ""
+    specialization: "",
+    location: "",
+    password: "",
+    confirmPassword: ""
   });
 
   const [formErrors, setFormErrors] = useState({});
 
   const validateForm = () => {
     const errors = {};
-    
-    if (!formData.name.trim()) errors.name = "Full name is required";
+    // name validation
+    if (!formData.name.trim()) errors.name = "Name is required";
+    // email validation
     if (!formData.email.trim()) errors.email = "Email is required";
-    if (!formData.phone.trim()) errors.phone = "Phone number is required";
-    if (!formData.nmcNumber.trim()) errors.nmcNumber = "NMC registration number is required";
-    if (!formData.specialty.trim()) errors.specialty = "Specialty is required";
-    if (!formData.experience.trim()) errors.experience = "Experience is required";
-    if (!formData.hospitalName.trim()) errors.hospitalName = "Hospital/Clinic name is required";
-    if (!formData.city.trim()) errors.city = "City is required";
-    
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = "Please enter a valid email address";
     }
-    
-    // Phone validation (basic)
-    if (formData.phone && !/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
-      errors.phone = "Please enter a valid 10-digit phone number";
+    // phone validation
+    if (!formData.phone.trim()) errors.phone = "Phone number is required";
+    else if (!/^\+?[\d\s\-()]{10,}$/.test(formData.phone)) {
+      errors.phone = "Please enter a valid phone number";
     }
-    
+    // specialization validation
+    if (!formData.specialization.trim()) errors.specialization = "Specialization is required";
+    // location validation
+    if (!formData.location.trim()) errors.location = "Location is required";
+    // password validation
+    if (!formData.password) errors.password = "Password is required";
+    else if (formData.password.length < 8 ||
+             !/[A-Z]/.test(formData.password) ||
+             !/[a-z]/.test(formData.password) ||
+             !/\d/.test(formData.password)) {
+      errors.password = "Password must be at least 8 characters with uppercase, lowercase and number";
+    }
+    // confirm password validation
+    if (!formData.confirmPassword) errors.confirmPassword = "Please confirm your password";
+    else if (formData.password !== formData.confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -180,10 +189,11 @@ export default function DoctorRegister() {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              {/* Personal Information */}
+              {/* Personal & Professional Information */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal & Professional Information</h3>
                 <div className="grid md:grid-cols-2 gap-4">
+                  {/* Name */}
                   <div>
                     <input
                       type="text"
@@ -197,6 +207,7 @@ export default function DoctorRegister() {
                     />
                     {formErrors.name && <p className="text-red-600 text-xs mt-1">{formErrors.name}</p>}
                   </div>
+                  {/* Email */}
                   <div>
                     <input
                       type="email"
@@ -210,6 +221,7 @@ export default function DoctorRegister() {
                     />
                     {formErrors.email && <p className="text-red-600 text-xs mt-1">{formErrors.email}</p>}
                   </div>
+                  {/* Phone */}
                   <div>
                     <input
                       type="tel"
@@ -223,86 +235,64 @@ export default function DoctorRegister() {
                     />
                     {formErrors.phone && <p className="text-red-600 text-xs mt-1">{formErrors.phone}</p>}
                   </div>
-                  <div>
-                    <input
-                      type="text"
-                      name="nmcNumber"
-                      placeholder="NMC Registration No. *"
-                      value={formData.nmcNumber}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors ${
-                        formErrors.nmcNumber ? 'border-red-300' : 'border-gray-300'
-                      }`}
-                    />
-                    {formErrors.nmcNumber && <p className="text-red-600 text-xs mt-1">{formErrors.nmcNumber}</p>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Professional Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Professional Information</h3>
-                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Specialization */}
                   <div>
                     <select
-                      name="specialty"
-                      value={formData.specialty}
+                      name="specialization"
+                      value={formData.specialization}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors ${
-                        formErrors.specialty ? 'border-red-300' : 'border-gray-300'
+                        formErrors.specialization ? 'border-red-300' : 'border-gray-300'
                       }`}
                     >
-                      <option value="">Select Specialty *</option>
+                      <option value="">Select Specialization *</option>
                       {specialties.map(specialty => (
                         <option key={specialty} value={specialty}>{specialty}</option>
                       ))}
                     </select>
-                    {formErrors.specialty && <p className="text-red-600 text-xs mt-1">{formErrors.specialty}</p>}
+                    {formErrors.specialization && <p className="text-red-600 text-xs mt-1">{formErrors.specialization}</p>}
                   </div>
-                  <div>
-                    <select
-                      name="experience"
-                      value={formData.experience}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors ${
-                        formErrors.experience ? 'border-red-300' : 'border-gray-300'
-                      }`}
-                    >
-                      <option value="">Years of Experience *</option>
-                      <option value="0-1">0-1 years</option>
-                      <option value="2-5">2-5 years</option>
-                      <option value="6-10">6-10 years</option>
-                      <option value="11-15">11-15 years</option>
-                      <option value="16-20">16-20 years</option>
-                      <option value="20+">20+ years</option>
-                    </select>
-                    {formErrors.experience && <p className="text-red-600 text-xs mt-1">{formErrors.experience}</p>}
-                  </div>
+                  {/* Location */}
                   <div>
                     <input
                       type="text"
-                      name="hospitalName"
-                      placeholder="Hospital/Clinic Name *"
-                      value={formData.hospitalName}
+                      name="location"
+                      placeholder="Location *"
+                      value={formData.location}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors ${
-                        formErrors.hospitalName ? 'border-red-300' : 'border-gray-300'
+                        formErrors.location ? 'border-red-300' : 'border-gray-300'
                       }`}
                     />
-                    {formErrors.hospitalName && <p className="text-red-600 text-xs mt-1">{formErrors.hospitalName}</p>}
+                    {formErrors.location && <p className="text-red-600 text-xs mt-1">{formErrors.location}</p>}
                   </div>
+                  {/* Password */}
                   <div>
                     <input
-                      type="text"
-                      name="city"
-                      placeholder="City *"
-                      value={formData.city}
+                      type="password"
+                      name="password"
+                      placeholder="Password *"
+                      value={formData.password}
                       onChange={handleInputChange}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors ${
-                        formErrors.city ? 'border-red-300' : 'border-gray-300'
+                        formErrors.password ? 'border-red-300' : 'border-gray-300'
                       }`}
                     />
-                    {formErrors.city && <p className="text-red-600 text-xs mt-1">{formErrors.city}</p>}
+                    {formErrors.password && <p className="text-red-600 text-xs mt-1">{formErrors.password}</p>}
+                  </div>
+                  {/* Confirm Password */}
+                  <div>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="Confirm Password *"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-colors ${
+                        formErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                      }`}
+                    />
+                    {formErrors.confirmPassword && <p className="text-red-600 text-xs mt-1">{formErrors.confirmPassword}</p>}
                   </div>
                 </div>
               </div>
