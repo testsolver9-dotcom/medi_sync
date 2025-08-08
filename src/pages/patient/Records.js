@@ -110,14 +110,18 @@ export default function Records() {
               <div className="space-y-2">
                 <div><span className="font-semibold">Date:</span> {selectedRecord.date}</div>
                 <div><span className="font-semibold">Doctor:</span> {selectedRecord.doctorName}</div>
-                {selectedRecord.symptoms && (
-                  <div><span className="font-semibold">Symptoms:</span> {selectedRecord.symptoms}</div>
+                {/* Show details using new medical_record fields */}
+                {selectedRecord.title && (
+                  <div><span className="font-semibold">Title:</span> {selectedRecord.title}</div>
                 )}
-                {selectedRecord.diagnosis && (
-                  <div><span className="font-semibold">Diagnosis:</span> {selectedRecord.diagnosis}</div>
+                {selectedRecord.description && (
+                  <div><span className="font-semibold">Description:</span> {selectedRecord.description}</div>
                 )}
-                {selectedRecord.medicines && (
-                  <div><span className="font-semibold">Medicines:</span> {selectedRecord.medicines}</div>
+                {selectedRecord.prescription && (
+                  <div><span className="font-semibold">Prescription:</span> {selectedRecord.prescription}</div>
+                )}
+                {selectedRecord.tests_recommended && (
+                  <div><span className="font-semibold">Tests Recommended:</span> {selectedRecord.tests_recommended}</div>
                 )}
                 {selectedRecord.notes && (
                   <div><span className="font-semibold">Notes:</span> {selectedRecord.notes}</div>
