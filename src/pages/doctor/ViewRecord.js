@@ -55,12 +55,24 @@ export default function ViewRecord() {
 
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold text-gray-800">Symptoms</h3>
-              <p className="mt-2 text-gray-700">{record.symptoms}</p>
+              <h3 className="font-semibold text-gray-800">Title</h3>
+              <p className="mt-2 text-gray-700">{record.title || 'Untitled Record'}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-800">Diagnosis</h3>
-              <p className="mt-2 text-gray-700">{record.diagnosis}</p>
+              <h3 className="font-semibold text-gray-800">Description</h3>
+              <p className="mt-2 text-gray-700">{record.description || 'No description provided.'}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800">Prescription</h3>
+              <p className="mt-2 text-gray-700">{record.prescription || 'No prescription specified.'}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800">Tests Recommended</h3>
+              <p className="mt-2 text-gray-700">{record.tests_recommended || 'None'}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-800">Notes</h3>
+              <p className="mt-2 text-gray-700">{record.notes || 'No additional notes.'}</p>
             </div>
           </div>
         </motion.div>
