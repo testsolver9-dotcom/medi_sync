@@ -10,8 +10,12 @@ import { uploadRecord } from "../../services/mockApi";
 export default function NewRecord() {
   const navigate = useNavigate();
   const { doctor, patient, location } = useDoctorStore();
-  const [symptoms, setSymptoms] = useState("");
-  const [medicines, setMedicines] = useState("");
+  // Fields aligned with medical_record table: title, description, prescription, tests recommended, notes
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [prescription, setPrescription] = useState("");
+  const [testsRecommended, setTestsRecommended] = useState("");
+  const [notes, setNotes] = useState("");
   const [timer, setTimer] = useState(15 * 60);
   const [feedback, setFeedback] = useState("");
 
@@ -35,10 +39,12 @@ export default function NewRecord() {
     try {
       await uploadRecord(patient.id, {
         doctorName: doctor.name,
-        symptoms,
-        medicines,
-        location,
-        // Optionally add diagnosis/notes if available
+        title,
+        description,
+        prescription,
+        tests_recommended: testsRecommended,
+        notes,
+        location
       });
       setFeedback("Record saved successfully!");
       setTimeout(() => {
@@ -60,18 +66,44 @@ export default function NewRecord() {
           </div>
           {/* Show feedback message above form */}
           {feedback && <div className={`mb-4 text-center font-semibold ${feedback.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{feedback}</div>}
+          {/* Title input */}
+          <input
+            placeholder="Record Title *"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-teal-500 transition"
+          />
+          {/* Description textarea */}
           <textarea
             rows={4}
-            placeholder="Describe symptoms..."
-            value={symptoms}
-            onChange={(e) => setSymptoms(e.target.value)}
+            placeholder="Description of condition / observations"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             className="w-full border-2 border-gray-200 rounded-lg p-4 focus:border-teal-500 transition"
           />
-          <input
-            placeholder="Medicines prescribed..."
-            value={medicines}
-            onChange={(e) => setMedicines(e.target.value)}
-            className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-teal-500 transition"
+          {/* Prescription textarea */}
+          <textarea
+            rows={3}
+            placeholder="Prescription (medicines, dosage, duration)"
+            value={prescription}
+            onChange={(e) => setPrescription(e.target.value)}
+            className="w-full border-2 border-gray-200 rounded-lg p-4 focus:border-teal-500 transition"
+          />
+          {/* Tests recommended textarea */}
+          <textarea
+            rows={3}
+            placeholder="Tests Recommended (if any)"
+            value={testsRecommended}
+            onChange={(e) => setTestsRecommended(e.target.value)}
+            className="w-full border-2 border-gray-200 rounded-lg p-4 focus:border-teal-500 transition"
+          />
+          {/* Notes textarea */}
+          <textarea
+            rows={3}
+            placeholder="Additional Notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full border-2 border-gray-200 rounded-lg p-4 focus:border-teal-500 transition"
           />
           <FancyButton onClick={onSubmit}>Save & Finish</FancyButton>
         </div>
