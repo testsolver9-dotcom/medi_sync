@@ -27,14 +27,15 @@ export default function PatientAuthModal() {
   const [otp, setOtp] = useState('');
 
   // NEW Registration fields - completely replacing old ones
+  // registration fields for patient
+  // align with database schema: name, email, phone, gender, address, password
   const [signupData, setSignupData] = useState({
-    fullName: '', 
-    email: '', 
-    phone: '', 
-    dateOfBirth: '', 
-    gender: '', 
-    address: '', 
-    password: '', 
+    name: '',
+    email: '',
+    phone: '',
+    gender: '',
+    address: '',
+    password: '',
     confirmPassword: ''
   });
 
@@ -62,13 +63,14 @@ export default function PatientAuthModal() {
 
   const validateSignupForm = () => {
     const errors = {};
-    const { fullName, email, phone, dateOfBirth, gender, address, password, confirmPassword } = signupData;
+    // destructure fields from signupData
+    const { name, email, phone, gender, address, password, confirmPassword } = signupData;
     
-    // Full Name validation
-    if (!fullName.trim()) {
-      errors.fullName = "Full name is required";
-    } else if (fullName.trim().length < 2) {
-      errors.fullName = "Full name must be at least 2 characters";
+    // Name validation
+    if (!name.trim()) {
+      errors.name = "Name is required";
+    } else if (name.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters";
     }
 
     // Email validation
@@ -78,24 +80,15 @@ export default function PatientAuthModal() {
       errors.email = "Please enter a valid email address";
     }
 
-    // Phone validation  
+    // Phone validation
     if (!phone.trim()) {
       errors.phone = "Phone number is required";
     } else if (!isValidPhone(phone)) {
       errors.phone = "Please enter a valid phone number (min 10 digits)";
     }
 
-    // Date of Birth validation
-    if (!dateOfBirth) {
-      errors.dateOfBirth = "Date of birth is required";
-    } else {
-      const dob = new Date(dateOfBirth);
-      const today = new Date();
-      const age = today.getFullYear() - dob.getFullYear();
-      if (age < 1 || age > 120) {
-        errors.dateOfBirth = "Please enter a valid date of birth";
-      }
-    }
+
+    // no date of birth in DB schema so no validation here
 
     // Gender validation
     if (!gender.trim()) {
@@ -387,19 +380,19 @@ export default function PatientAuthModal() {
               >
                 {step === 1 ? (
                   <div className="space-y-4">
-                    {/* Full Name */}
+                    {/* Name */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                       <input
                         type="text"
-                        placeholder="Enter your full name"
-                        value={signupData.fullName}
-                        onChange={e => handleInputChange('fullName', e.target.value)}
+                        placeholder="Enter your name"
+                        value={signupData.name}
+                        onChange={e => handleInputChange('name', e.target.value)}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                          formErrors.fullName ? 'border-red-300' : 'border-gray-300'
+                          formErrors.name ? 'border-red-300' : 'border-gray-300'
                         }`}
                       />
-                      {formErrors.fullName && <p className="text-red-600 text-xs mt-1">{formErrors.fullName}</p>}
+                      {formErrors.name && <p className="text-red-600 text-xs mt-1">{formErrors.name}</p>}
                     </div>
                     
                     {/* Email */}
@@ -432,38 +425,22 @@ export default function PatientAuthModal() {
                       {formErrors.phone && <p className="text-red-600 text-xs mt-1">{formErrors.phone}</p>}
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
-                      {/* Date of Birth */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth *</label>
-                        <input
-                          type="date"
-                          value={signupData.dateOfBirth}
-                          onChange={e => handleInputChange('dateOfBirth', e.target.value)}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                            formErrors.dateOfBirth ? 'border-red-300' : 'border-gray-300'
-                          }`}
-                        />
-                        {formErrors.dateOfBirth && <p className="text-red-600 text-xs mt-1">{formErrors.dateOfBirth}</p>}
-                      </div>
-                      
-                      {/* Gender */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
-                        <select
-                          value={signupData.gender}
-                          onChange={e => handleInputChange('gender', e.target.value)}
-                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                            formErrors.gender ? 'border-red-300' : 'border-gray-300'
-                          }`}
-                        >
-                          <option value="">Select Gender</option>
-                          <option value="Male">Male</option>
-                          <option value="Female">Female</option>
-                          <option value="Other">Other</option>
-                        </select>
-                        {formErrors.gender && <p className="text-red-600 text-xs mt-1">{formErrors.gender}</p>}
-                      </div>
+                    {/* Gender */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                      <select
+                        value={signupData.gender}
+                        onChange={e => handleInputChange('gender', e.target.value)}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                          formErrors.gender ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {formErrors.gender && <p className="text-red-600 text-xs mt-1">{formErrors.gender}</p>}
                     </div>
                     
                     {/* Address */}
