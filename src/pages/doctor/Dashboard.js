@@ -55,7 +55,16 @@ export default function DoctorDashboard() {
                   className="bg-white rounded-2xl shadow p-6 cursor-pointer"
                 >
                   <p className="font-semibold">{r.date}</p>
-                  <p className="text-gray-700 mt-2">{r.symptoms}</p>
+                  {/* Display record title or fallback */}
+                  <p className="text-gray-800 mt-2 font-semibold">
+                    {r.title || 'Untitled Record'}
+                  </p>
+                  {/* Show a short preview of description */}
+                  {r.description && (
+                    <p className="text-gray-600 mt-1 text-sm">
+                      {r.description.length > 80 ? r.description.slice(0, 80) + '…' : r.description}
+                    </p>
+                  )}
                   <Link
                     to={`/doctor/records/${r.id}`}
                     className="mt-4 inline-block text-teal-600 underline"
