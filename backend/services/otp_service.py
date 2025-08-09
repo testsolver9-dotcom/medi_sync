@@ -83,12 +83,22 @@ class OTPService:
             
             message_body = message_templates.get(otp_type, f"Your MediSync OTP is: {otp}. Valid for 5 minutes.")
             
-            # Send SMS via Twilio
-            message = self.client.messages.create(
-                body=message_body,
-                from_=self.twilio_phone,
-                to=normalized_phone
-            )
+            # Demo/Test phone numbers - bypass Twilio for testing
+            test_numbers = ["+917894561230", "+919876543210", "+918888888888", "+917777777777"]
+            
+            if normalized_phone in test_numbers:
+                # For demo numbers, don't actually send SMS, just log
+                print(f"📱 DEMO OTP for {normalized_phone}: {otp} (Type: {otp_type})")
+                twilio_sid = f"demo_{int(current_time)}"
+            else:
+                # Send SMS via Twilio for real numbers
+                message = self.client.messages.create(
+                    body=message_body,
+                    from_=self.twilio_phone,
+                    to=normalized_phone
+                )
+                twilio_sid = message.sid
+                print(f"📱 OTP sent to {normalized_phone} (Type: {otp_type}, SID: {message.sid})")
             
             # Store OTP in memory
             self.otp_store[normalized_phone] = {
@@ -96,16 +106,15 @@ class OTPService:
                 'timestamp': current_time,
                 'type': otp_type,
                 'attempts': 0,
-                'twilio_sid': message.sid
+                'twilio_sid': twilio_sid
             }
-            
-            print(f"📱 OTP sent to {normalized_phone} (Type: {otp_type}, SID: {message.sid})")
             
             return {
                 'success': True,
                 'message': 'OTP sent successfully',
                 'phone': normalized_phone,
-                'expires_in': self.otp_expiry
+                'expires_in': self.otp_expiry,
+                'demo_otp': otp if normalized_phone in test_numbers else None
             }
             
         except TwilioException as e:
