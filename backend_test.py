@@ -20,9 +20,9 @@ class MediSyncAPITester:
         # Test phone numbers from the request
         self.test_phones = {
             'existing_patient': '+917894561230',
-            'new_patient': '+918888888888', 
+            'new_patient': f'+91{int(time.time()) % 10000000000}',  # Generate unique number
             'existing_doctor': '+919876543210',
-            'new_doctor': '+917777777777'
+            'new_doctor': f'+91{int(time.time()) % 10000000000 + 1}'  # Generate unique number
         }
 
     def log_test(self, name, status, details=""):
