@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { registerDoctor, verifyDoctorSignupOtp } from "../../services/doctorApi";
+import { registerDoctor, verifyDoctorSignupOtp } from "../../services/realApi";
 import { useDoctorStore } from "../../store/useDoctorStore";
 
 export default function DoctorRegister() {
