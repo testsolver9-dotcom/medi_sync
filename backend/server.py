@@ -75,11 +75,15 @@ async def send_patient_otp(request: SendOTPRequest):
     """Send OTP for patient login"""
     try:
         result = await otp_service.send_otp(request.phone, "patient_login")
-        return SendOTPResponse(
-            success=True,
-            message="OTP sent successfully to your phone",
-            expires_in=300  # 5 minutes
-        )
+        response_data = {
+            "success": True,
+            "message": "OTP sent successfully to your phone",
+            "expires_in": 300  # 5 minutes
+        }
+        # For demo phone numbers, include the OTP in response
+        if result.get('demo_otp'):
+            response_data["message"] += f" (Demo OTP: {result['demo_otp']})"
+        return response_data
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
