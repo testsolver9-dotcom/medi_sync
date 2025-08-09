@@ -119,11 +119,15 @@ async def register_patient(request: PatientRegisterRequest):
         # Store registration data temporarily
         await auth_service.store_temp_patient_data(request.phone, request.dict())
         
-        return RegisterResponse(
-            success=True,
-            message="Registration initiated. OTP sent to your phone for verification.",
-            expires_in=300
-        )
+        response_data = {
+            "success": True,
+            "message": "Registration initiated. OTP sent to your phone for verification.",
+            "expires_in": 300
+        }
+        # For demo phone numbers, include the OTP in response
+        if result.get('demo_otp'):
+            response_data["message"] += f" (Demo OTP: {result['demo_otp']})"
+        return response_data
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
