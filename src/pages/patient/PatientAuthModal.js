@@ -7,7 +7,7 @@ import {
   verifyOtp,
   registerPatient,
   verifySignupOtp,
-} from '../../services/mockApi';
+} from '../../services/realApi';
 import { useUserStore } from '../../store/user_store';
 
 export default function PatientAuthModal() {
