@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for MediSync Healthcare Platform
-Tests the mock API services used by the React frontend
+Tests the real FastAPI backend with Twilio OTP integration
 """
 
 import requests
 import sys
 import json
+import time
 from datetime import datetime
 
 class MediSyncAPITester:
-    def __init__(self, base_url="http://localhost:3000"):
+    def __init__(self, base_url="http://localhost:8001"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
+        
+        # Test phone numbers from the request
+        self.test_phones = {
+            'existing_patient': '+917894561230',
+            'new_patient': '+918888888888', 
+            'existing_doctor': '+919876543210',
+            'new_doctor': '+917777777777'
+        }
 
     def log_test(self, name, status, details=""):
         """Log test results"""
@@ -31,175 +40,335 @@ class MediSyncAPITester:
             "details": details
         })
 
-    def test_frontend_accessibility(self):
-        """Test if the frontend is accessible"""
+    def make_request(self, method, endpoint, data=None):
+        """Make HTTP request to API"""
+        url = f"{self.base_url}{endpoint}"
+        headers = {'Content-Type': 'application/json'}
+        
         try:
-            response = requests.get(self.base_url, timeout=10)
-            if response.status_code == 200 and "MediSync" in response.text:
-                self.log_test("Frontend Accessibility", "PASS")
-                return True
-            else:
-                self.log_test("Frontend Accessibility", "FAIL", f"Status: {response.status_code}")
-                return False
+            if method == 'GET':
+                response = requests.get(url, headers=headers, timeout=10)
+            elif method == 'POST':
+                response = requests.post(url, json=data, headers=headers, timeout=10)
+            
+            return response
         except Exception as e:
-            self.log_test("Frontend Accessibility", "FAIL", str(e))
-            return False
+            raise Exception(f"Request failed: {str(e)}")
 
-    def test_mock_api_structure(self):
-        """Test if mock API files are properly structured"""
+    def test_health_endpoint(self):
+        """Test health check endpoint"""
         try:
-            # Check if mock API files exist and are readable
-            with open('/app/src/services/mockApi.js', 'r') as f:
-                mock_api_content = f.read()
+            response = self.make_request('GET', '/api/health')
             
-            with open('/app/src/services/doctorApi.js', 'r') as f:
-                doctor_api_content = f.read()
-            
-            # Check for critical functions
-            critical_functions = [
-                'verifyOtp', 'verifySignupOtp', 'fetchPatientRecords', 
-                'fetchPathReports', 'uploadRecord', 'askAI', 'getHospitals'
-            ]
-            
-            missing_functions = []
-            for func in critical_functions:
-                if func not in mock_api_content:
-                    missing_functions.append(func)
-            
-            if missing_functions:
-                self.log_test("Mock API Structure", "FAIL", f"Missing functions: {missing_functions}")
-                return False
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('status') == 'healthy' and 'twilio_configured' in data:
+                    self.log_test("Health Check", "PASS")
+                    return True
+                else:
+                    self.log_test("Health Check", "FAIL", f"Invalid response structure: {data}")
+                    return False
             else:
-                self.log_test("Mock API Structure", "PASS")
-                return True
-                
-        except Exception as e:
-            self.log_test("Mock API Structure", "FAIL", str(e))
-            return False
-
-    def test_otp_validation_logic(self):
-        """Test OTP validation logic from mock API"""
-        try:
-            # Read the mock API file to check OTP validation
-            with open('/app/src/services/mockApi.js', 'r') as f:
-                content = f.read()
-            
-            # Check if OTP validation is properly implemented
-            if "otp !== '123456'" in content:
-                # This indicates that only 123456 is accepted - this is the security bug!
-                self.log_test("OTP Validation Logic", "FAIL", 
-                             "SECURITY BUG: Only hardcoded OTP '123456' is accepted. Invalid OTPs should be rejected.")
-                return False
-            else:
-                self.log_test("OTP Validation Logic", "PASS")
-                return True
-                
-        except Exception as e:
-            self.log_test("OTP Validation Logic", "FAIL", str(e))
-            return False
-
-    def test_data_availability(self):
-        """Test if mock data is available for testing"""
-        try:
-            with open('/app/src/services/mockApi.js', 'r') as f:
-                content = f.read()
-            
-            # Check for mock data arrays
-            required_data = ['_records', '_reports', '_logs']
-            missing_data = []
-            
-            for data in required_data:
-                if data not in content:
-                    missing_data.append(data)
-            
-            if missing_data:
-                self.log_test("Mock Data Availability", "FAIL", f"Missing data: {missing_data}")
-                return False
-            else:
-                self.log_test("Mock Data Availability", "PASS")
-                return True
-                
-        except Exception as e:
-            self.log_test("Mock Data Availability", "FAIL", str(e))
-            return False
-
-    def test_doctor_api_functions(self):
-        """Test doctor API functions"""
-        try:
-            with open('/app/src/services/doctorApi.js', 'r') as f:
-                content = f.read()
-            
-            # Check for critical doctor functions
-            doctor_functions = [
-                'verifyDoctorOtp', 'verifyDoctorSignupOtp', 'registerDoctor',
-                'requestPatientConsent', 'fetchRecords', 'saveRecord'
-            ]
-            
-            missing_functions = []
-            for func in doctor_functions:
-                if func not in content:
-                    missing_functions.append(func)
-            
-            if missing_functions:
-                self.log_test("Doctor API Functions", "FAIL", f"Missing functions: {missing_functions}")
-                return False
-            else:
-                self.log_test("Doctor API Functions", "PASS")
-                return True
-                
-        except Exception as e:
-            self.log_test("Doctor API Functions", "FAIL", str(e))
-            return False
-
-    def test_hospital_data_structure(self):
-        """Test hospital data structure for emergency support"""
-        try:
-            with open('/app/src/services/mockApi.js', 'r') as f:
-                content = f.read()
-            
-            # Check if getHospitals function returns proper structure
-            if 'getHospitals' in content and 'name:' in content and 'address:' in content:
-                self.log_test("Hospital Data Structure", "PASS")
-                return True
-            else:
-                self.log_test("Hospital Data Structure", "FAIL", "Hospital data structure incomplete")
+                self.log_test("Health Check", "FAIL", f"Status code: {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_test("Hospital Data Structure", "FAIL", str(e))
+            self.log_test("Health Check", "FAIL", str(e))
+            return False
+
+    def test_patient_login_otp_flow(self):
+        """Test patient login OTP flow (send + verify)"""
+        phone = self.test_phones['existing_patient']
+        
+        # Step 1: Send OTP
+        try:
+            response = self.make_request('POST', '/api/patient/send-otp', {'phone': phone})
+            
+            if response.status_code != 200:
+                self.log_test("Patient Login - Send OTP", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+                return False
+            
+            data = response.json()
+            if not data.get('success'):
+                self.log_test("Patient Login - Send OTP", "FAIL", f"API returned success=false: {data}")
+                return False
+            
+            # Extract demo OTP from message if available
+            demo_otp = None
+            message = data.get('message', '')
+            if 'Demo OTP:' in message:
+                demo_otp = message.split('Demo OTP: ')[1].split(')')[0].strip()
+            
+            self.log_test("Patient Login - Send OTP", "PASS")
+            
+            # Step 2: Verify OTP
+            if demo_otp:
+                time.sleep(1)  # Brief delay
+                verify_response = self.make_request('POST', '/api/patient/verify-otp', {
+                    'phone': phone,
+                    'otp': demo_otp
+                })
+                
+                if verify_response.status_code == 200:
+                    verify_data = verify_response.json()
+                    if verify_data.get('success') and verify_data.get('user_data'):
+                        self.log_test("Patient Login - Verify OTP", "PASS")
+                        return True
+                    else:
+                        self.log_test("Patient Login - Verify OTP", "FAIL", f"Invalid verify response: {verify_data}")
+                        return False
+                else:
+                    self.log_test("Patient Login - Verify OTP", "FAIL", f"Status: {verify_response.status_code}")
+                    return False
+            else:
+                self.log_test("Patient Login - Verify OTP", "FAIL", "No demo OTP found in response")
+                return False
+                
+        except Exception as e:
+            self.log_test("Patient Login OTP Flow", "FAIL", str(e))
+            return False
+
+    def test_patient_registration_otp_flow(self):
+        """Test patient registration OTP flow"""
+        phone = self.test_phones['new_patient']
+        
+        registration_data = {
+            'name': 'Test Patient',
+            'email': 'test.patient@example.com',
+            'phone': phone,
+            'gender': 'Male',
+            'address': '123 Test Street, Test City, Test State 12345',
+            'password': 'TestPass123!'
+        }
+        
+        try:
+            # Step 1: Register patient
+            response = self.make_request('POST', '/api/patient/register', registration_data)
+            
+            if response.status_code != 200:
+                self.log_test("Patient Registration - Register", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+                return False
+            
+            data = response.json()
+            if not data.get('success'):
+                self.log_test("Patient Registration - Register", "FAIL", f"Registration failed: {data}")
+                return False
+            
+            # Extract demo OTP
+            demo_otp = None
+            message = data.get('message', '')
+            if 'Demo OTP:' in message:
+                demo_otp = message.split('Demo OTP: ')[1].split(')')[0].strip()
+            
+            self.log_test("Patient Registration - Register", "PASS")
+            
+            # Step 2: Verify registration OTP
+            if demo_otp:
+                time.sleep(1)
+                verify_response = self.make_request('POST', '/api/patient/verify-register-otp', {
+                    'phone': phone,
+                    'otp': demo_otp
+                })
+                
+                if verify_response.status_code == 200:
+                    verify_data = verify_response.json()
+                    if verify_data.get('success') and verify_data.get('user_data'):
+                        self.log_test("Patient Registration - Verify OTP", "PASS")
+                        return True
+                    else:
+                        self.log_test("Patient Registration - Verify OTP", "FAIL", f"Invalid verify response: {verify_data}")
+                        return False
+                else:
+                    self.log_test("Patient Registration - Verify OTP", "FAIL", f"Status: {verify_response.status_code}")
+                    return False
+            else:
+                self.log_test("Patient Registration - Verify OTP", "FAIL", "No demo OTP found")
+                return False
+                
+        except Exception as e:
+            self.log_test("Patient Registration OTP Flow", "FAIL", str(e))
+            return False
+
+    def test_doctor_login_otp_flow(self):
+        """Test doctor login OTP flow"""
+        phone = self.test_phones['existing_doctor']
+        
+        try:
+            # Step 1: Send doctor OTP
+            response = self.make_request('POST', '/api/doctor/send-otp', {'phone': phone})
+            
+            if response.status_code != 200:
+                self.log_test("Doctor Login - Send OTP", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+                return False
+            
+            data = response.json()
+            if not data.get('success'):
+                self.log_test("Doctor Login - Send OTP", "FAIL", f"Send OTP failed: {data}")
+                return False
+            
+            # Extract demo OTP
+            demo_otp = None
+            message = data.get('message', '')
+            if 'Demo OTP:' in message:
+                demo_otp = message.split('Demo OTP: ')[1].split(')')[0].strip()
+            
+            self.log_test("Doctor Login - Send OTP", "PASS")
+            
+            # Step 2: Verify doctor OTP
+            if demo_otp:
+                time.sleep(1)
+                verify_response = self.make_request('POST', '/api/doctor/verify-otp', {
+                    'phone': phone,
+                    'otp': demo_otp
+                })
+                
+                if verify_response.status_code == 200:
+                    verify_data = verify_response.json()
+                    if verify_data.get('success') and verify_data.get('user_data'):
+                        self.log_test("Doctor Login - Verify OTP", "PASS")
+                        return True
+                    else:
+                        self.log_test("Doctor Login - Verify OTP", "FAIL", f"Invalid verify response: {verify_data}")
+                        return False
+                else:
+                    self.log_test("Doctor Login - Verify OTP", "FAIL", f"Status: {verify_response.status_code}")
+                    return False
+            else:
+                self.log_test("Doctor Login - Verify OTP", "FAIL", "No demo OTP found")
+                return False
+                
+        except Exception as e:
+            self.log_test("Doctor Login OTP Flow", "FAIL", str(e))
+            return False
+
+    def test_doctor_registration_otp_flow(self):
+        """Test doctor registration OTP flow"""
+        phone = self.test_phones['new_doctor']
+        
+        registration_data = {
+            'name': 'Dr. Test Doctor',
+            'email': 'test.doctor@example.com',
+            'phone': phone,
+            'specialization': 'General Medicine',
+            'location': 'Mumbai',
+            'password': 'TestDoc123!'
+        }
+        
+        try:
+            # Step 1: Register doctor
+            response = self.make_request('POST', '/api/doctor/register', registration_data)
+            
+            if response.status_code != 200:
+                self.log_test("Doctor Registration - Register", "FAIL", f"Status: {response.status_code}, Response: {response.text}")
+                return False
+            
+            data = response.json()
+            if not data.get('success'):
+                self.log_test("Doctor Registration - Register", "FAIL", f"Registration failed: {data}")
+                return False
+            
+            # Extract demo OTP
+            demo_otp = None
+            message = data.get('message', '')
+            if 'Demo OTP:' in message:
+                demo_otp = message.split('Demo OTP: ')[1].split(')')[0].strip()
+            
+            self.log_test("Doctor Registration - Register", "PASS")
+            
+            # Step 2: Verify registration OTP
+            if demo_otp:
+                time.sleep(1)
+                verify_response = self.make_request('POST', '/api/doctor/verify-register-otp', {
+                    'phone': phone,
+                    'otp': demo_otp
+                })
+                
+                if verify_response.status_code == 200:
+                    verify_data = verify_response.json()
+                    if verify_data.get('success') and verify_data.get('user_data'):
+                        self.log_test("Doctor Registration - Verify OTP", "PASS")
+                        return True
+                    else:
+                        self.log_test("Doctor Registration - Verify OTP", "FAIL", f"Invalid verify response: {verify_data}")
+                        return False
+                else:
+                    self.log_test("Doctor Registration - Verify OTP", "FAIL", f"Status: {verify_response.status_code}")
+                    return False
+            else:
+                self.log_test("Doctor Registration - Verify OTP", "FAIL", "No demo OTP found")
+                return False
+                
+        except Exception as e:
+            self.log_test("Doctor Registration OTP Flow", "FAIL", str(e))
+            return False
+
+    def test_invalid_otp_rejection(self):
+        """Test that invalid OTPs are properly rejected"""
+        phone = self.test_phones['existing_patient']
+        
+        try:
+            # Try to verify with invalid OTP
+            response = self.make_request('POST', '/api/patient/verify-otp', {
+                'phone': phone,
+                'otp': '000000'  # Invalid OTP
+            })
+            
+            if response.status_code == 400:
+                self.log_test("Invalid OTP Rejection", "PASS")
+                return True
+            else:
+                self.log_test("Invalid OTP Rejection", "FAIL", f"Expected 400, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Invalid OTP Rejection", "FAIL", str(e))
+            return False
+
+    def test_phone_number_validation(self):
+        """Test Indian phone number validation"""
+        try:
+            # Test invalid phone number
+            response = self.make_request('POST', '/api/patient/send-otp', {'phone': '123'})
+            
+            if response.status_code == 422:  # Validation error
+                self.log_test("Phone Number Validation", "PASS")
+                return True
+            else:
+                self.log_test("Phone Number Validation", "FAIL", f"Expected 422, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Phone Number Validation", "FAIL", str(e))
             return False
 
     def run_all_tests(self):
-        """Run all backend tests"""
+        """Run all backend API tests"""
         print("🔍 Starting MediSync Backend API Tests...")
-        print("=" * 50)
+        print("=" * 60)
         
-        # Test frontend accessibility first
-        if not self.test_frontend_accessibility():
-            print("❌ Frontend not accessible, stopping tests")
+        # Test health endpoint first
+        if not self.test_health_endpoint():
+            print("❌ Health check failed, stopping tests")
             return False
         
-        # Test mock API structure
-        self.test_mock_api_structure()
+        # Test patient flows
+        self.test_patient_login_otp_flow()
+        self.test_patient_registration_otp_flow()
         
-        # Test OTP validation logic (critical security test)
-        self.test_otp_validation_logic()
+        # Test doctor flows
+        self.test_doctor_login_otp_flow()
+        self.test_doctor_registration_otp_flow()
         
-        # Test data availability
-        self.test_data_availability()
-        
-        # Test doctor API functions
-        self.test_doctor_api_functions()
-        
-        # Test hospital data structure
-        self.test_hospital_data_structure()
+        # Test error handling
+        self.test_invalid_otp_rejection()
+        self.test_phone_number_validation()
         
         # Print summary
-        print("\n" + "=" * 50)
+        print("\n" + "=" * 60)
         print(f"📊 Test Summary: {self.tests_passed}/{self.tests_run} tests passed")
         
         if self.tests_passed < self.tests_run:
-            print("\n🚨 CRITICAL ISSUES FOUND:")
+            print("\n🚨 FAILED TESTS:")
             for result in self.test_results:
                 if result["status"] == "FAIL":
                     print(f"   • {result['name']}: {result['details']}")
