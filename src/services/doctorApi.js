@@ -1,5 +1,5 @@
 // Mock implementations for doctor workflows
-import { fetchPatientRecords } from "./mockApi";
+import { fetchPatientRecords } from "./realApi";
 export const sendDoctorOtp = async (doctorId) => {
   console.debug("Mock: send OTP to doctor", doctorId);
   return Promise.resolve();
