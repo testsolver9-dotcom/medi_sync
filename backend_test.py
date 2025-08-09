@@ -17,12 +17,12 @@ class MediSyncAPITester:
         self.tests_passed = 0
         self.test_results = []
         
-        # Test phone numbers from the request
+        # Test phone numbers from the request (using demo numbers that bypass Twilio)
         self.test_phones = {
             'existing_patient': '+917894561230',
-            'new_patient': f'+91{int(time.time()) % 10000000000}',  # Generate unique number
+            'new_patient': '+918888888888',  # Demo number for testing
             'existing_doctor': '+919876543210',
-            'new_doctor': f'+91{int(time.time()) % 10000000000 + 1}'  # Generate unique number
+            'new_doctor': '+917777777777'  # Demo number for testing
         }
 
     def log_test(self, name, status, details=""):
